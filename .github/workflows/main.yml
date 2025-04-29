@@ -1,0 +1,31 @@
+# .github/workflows/project-card-moved.yml
+name: “On Project V2 Card Moved”
+
+# 🚀 Trigger on ANY edit to a Project V2 item
+on:
+  project_v2_item:
+    types: [edited]
+
+permissions:
+  # allow reading the event payload and statuses
+  contents: none
+  issues: none
+  pull-requests: none
+  # need project scope to read the field_value change
+  projects: read
+
+jobs:
+  when-status-changes:
+    # only run if the change was in the 'field_value' for your single-select column
+    if: >-
+      github.event.changes.field_value != null &&
+      github.event.changes.field_value.field_name == 'Status'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Announce column move
+        run: |
+          echo "Card moved in ProjectV2:"
+          echo "  Issue #${{ github.event.project_v2_item.content.number }} — ${{ github.event.project_v2_item.content.title }}"
+          echo "  from  → ${{ github.event.changes.field_value.from.name }}"
+          echo "  to    → ${{ github.event.changes.field_value.to.name }}"
